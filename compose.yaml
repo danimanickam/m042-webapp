@@ -23,11 +23,12 @@ services:
     # No published port: the database is only reachable from the app container.
 
   app:
-    build:
-      context: .
-      args:
-        GIT_SHA: dev
+    # Built by GitHub Actions (with the commit hash as version) and kept current by "updater".
+    image: ghcr.io/danimanickam/m042-webapp:latest
     restart: unless-stopped
+    labels:
+      # Only containers with this label are updated automatically (see WATCHTOWER_LABEL_ENABLE).
+      com.centurylinklabs.watchtower.enable: "true"
     environment:
       PGHOST: db
       PGUSER: app
@@ -45,6 +46,20 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+
+  updater:
+    # Maintained fork of Watchtower (containrrr/watchtower is archived).
+    image: nickfedor/watchtower:1.24.2
+    restart: unless-stopped
+    environment:
+      WATCHTOWER_LABEL_ENABLE: "true"    # touch only labelled containers (app), never db
+      WATCHTOWER_POLL_INTERVAL: "60"     # check ghcr.io for a new image every 60 s
+      WATCHTOWER_CLEANUP: "true"         # remove the old app image after an update
+      WATCHTOWER_REMOVE_VOLUMES: "false" # never delete volumes (explicit, is the default)
+      TZ: Europe/Zurich
+    volumes:
+      # Needed to pull images and recreate the app container. Powerful access: see checklist.
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   pgdata:
