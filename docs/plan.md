@@ -8,7 +8,9 @@
 - Phase 4 umgesetzt: Workflow `.github/workflows/build.yml` baut bei jedem Push auf `main` (arm64-Runner, ca. 30 s) und pusht `ghcr.io/danimanickam/m042-webapp:latest` + `:sha-<hash>`. Erster Lauf grün; Image ist linux/arm64, enthält `APP_VERSION=2d69ea2`, anonym abrufbar (öffentlich).
 - Phase 5 umgesetzt: `app` nutzt `ghcr.io/danimanickam/m042-webapp:latest`, `updater` (Watchtower-Fork) prüft alle 60 s nur die App. Gemessen: Push → live in ca. 50 s (Build ~30 s + bis zu 60 s Wartezeit des Updaters). DB lief dabei ohne Unterbruch, Zähler blieb erhalten.
 - Phase 6 umgesetzt: Container `tunnel` (`cloudflare/cloudflared:2026.11.2`, Quick Tunnel auf `http://app:3000`). Öffentlich über HTTPS erreichbar, Zertifikat gültig, http → https-Weiterleitung. Aktuelle Adresse: `docker compose logs tunnel | grep trycloudflare`.
-- Nächster Schritt: Phase 7 – Push auf main geht ohne Handarbeit live.
+- Phase 6 von Dani auf dem Handy im Mobilnetz geprüft.
+- Phase 7 erfolgreich (von Dani bestätigt): Farbänderung (Commit 280b28e) ging ohne Handarbeit live, Push 16:18:50 → live 16:20:00 (70 s). Damit sind Ziel, Vorgaben 1–7 und M1–M4 umgesetzt.
+- Nächster Schritt: Phase 8 – Betriebs-Checkliste.
 
 ## Architektur (4 Container, docker compose)
 | Container | Image | Aufgabe |
