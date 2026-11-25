@@ -1,0 +1,50 @@
+# M042 Webapp: app and database in separate containers.
+# Start:   docker compose up -d
+# Restart: docker compose restart   (NEVER "down -v": that deletes the database volume)
+
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_DB: app
+      # Secret comes only from the local .env file (not in the repository).
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}
+    volumes:
+      # Named volume: data survives container restarts and re-creation (M1).
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    # No published port: the database is only reachable from the app container.
+
+  app:
+    build:
+      context: .
+      args:
+        GIT_SHA: dev
+    restart: unless-stopped
+    environment:
+      PGHOST: db
+      PGUSER: app
+      PGDATABASE: app
+      PGPASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt in .env}
+    ports:
+      # Only reachable from this Mac (localhost), not from the local network.
+      - "127.0.0.1:8080:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  pgdata:
