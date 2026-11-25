@@ -6,7 +6,8 @@
 - Phase 2 umgesetzt und getestet: App + DB laufen lokal auf `http://localhost:8080`, Zähler überlebt Neustart und Neuerstellen, Fehleranzeige ohne DB funktioniert. Von Dani geprüft (Neustart-Test 15 → 16).
 - Phase 3 umgesetzt: öffentliches Repo https://github.com/danimanickam/m042-webapp (Branch `main`), `.env` nicht enthalten. Secret Scanning und Push Protection aktiv (GitHub-Standard).
 - Phase 4 umgesetzt: Workflow `.github/workflows/build.yml` baut bei jedem Push auf `main` (arm64-Runner, ca. 30 s) und pusht `ghcr.io/danimanickam/m042-webapp:latest` + `:sha-<hash>`. Erster Lauf grün; Image ist linux/arm64, enthält `APP_VERSION=2d69ea2`, anonym abrufbar (öffentlich).
-- Nächster Schritt: Phase 5 – Auto-Deployment auf dem Laptop.
+- Phase 5 umgesetzt: `app` nutzt `ghcr.io/danimanickam/m042-webapp:latest`, `updater` (Watchtower-Fork) prüft alle 60 s nur die App. Gemessen: Push → live in ca. 50 s (Build ~30 s + bis zu 60 s Wartezeit des Updaters). DB lief dabei ohne Unterbruch, Zähler blieb erhalten.
+- Nächster Schritt: Phase 6 – Cloudflare Quick Tunnel.
 
 ## Architektur (4 Container, docker compose)
 | Container | Image | Aufgabe |
@@ -29,6 +30,7 @@ Ablauf: Push auf `main` → GitHub Actions (arm64-Runner) baut Image mit Commit-
 - Ohne DB: Seite zeigt «DB: FEHLER – nicht erreichbar», `/health` meldet Fehler (HTTP 503).
 - `.env` enthält nur `POSTGRES_PASSWORD` (zufällig); DB-Benutzer und DB-Name `app` sind nicht geheim.
 - Commits als «Dani» mit anonymer GitHub-noreply-Adresse (nur in diesem Repo gesetzt).
+- Updater-Einstellungen: `WATCHTOWER_LABEL_ENABLE=true`, `POLL_INTERVAL=60`, `CLEANUP=true`, `REMOVE_VOLUMES=false`; App hat Label `com.centurylinklabs.watchtower.enable=true`. Lokales Bauen aus compose.yaml entfernt (nur noch Image aus CI).
 - Datenvolume `m042-webapp_pgdata` (Postgres 18: Mount auf `/var/lib/postgresql`).
 
 ## Offene Fragen / Punkte für später
