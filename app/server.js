@@ -43,7 +43,7 @@ function escapeHtml(s) {
 }
 
 function page(line, ok) {
-  const color = ok ? "#1a7f37" : "#cf222e";
+  const color = ok ? "#0969da" : "#cf222e";
   return `<!doctype html>
 <html lang="de">
 <head>
@@ -52,7 +52,7 @@ function page(line, ok) {
 <title>M042 Webapp</title>
 <style>
   body { font-family: system-ui, sans-serif; margin: 0; min-height: 100vh;
-         display: flex; align-items: center; justify-content: center; background: #f6f8fa; }
+         display: flex; align-items: center; justify-content: center; background: #ddf4ff; }
   p { font-size: 1.4rem; padding: 1.5rem 2rem; background: #fff; border-radius: 12px;
       border-left: 8px solid ${color}; box-shadow: 0 2px 8px rgba(0,0,0,.08); margin: 1rem; }
 </style>
