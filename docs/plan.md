@@ -10,7 +10,8 @@
 - Phase 6 umgesetzt: Container `tunnel` (`cloudflare/cloudflared:2026.11.2`, Quick Tunnel auf `http://app:3000`). Öffentlich über HTTPS erreichbar, Zertifikat gültig, http → https-Weiterleitung. Aktuelle Adresse: `docker compose logs tunnel | grep trycloudflare`.
 - Phase 6 von Dani auf dem Handy im Mobilnetz geprüft.
 - Phase 7 erfolgreich (von Dani bestätigt): Farbänderung (Commit 280b28e) ging ohne Handarbeit live, Push 16:18:50 → live 16:20:00 (70 s). Damit sind Ziel, Vorgaben 1–7 und M1–M4 umgesetzt.
-- Nächster Schritt: Phase 8 – Betriebs-Checkliste.
+- Phase 8 abgeschlossen: `docs/betriebs-checkliste.md` (43 Punkte: 21 umgesetzt, 9 geplant, 13 bewusst weggelassen), Entscheide von Dani übernommen.
+- Alle Phasen der Übung abgeschlossen.
 
 ## Architektur (4 Container, docker compose)
 | Container | Image | Aufgabe |
@@ -38,4 +39,5 @@ Ablauf: Push auf `main` → GitHub Actions (arm64-Runner) baut Image mit Commit-
 - Datenvolume `m042-webapp_pgdata` (Postgres 18: Mount auf `/var/lib/postgresql`).
 
 ## Offene Fragen / Punkte für später
-- Für Checkliste: updater hat Zugriff auf `docker.sock`; Tunnel-URL ändert bei Neustart; Docker Desktop muss nach Mac-Neustart laufen.
+- Geplante Punkte aus der Checkliste (noch nicht umgesetzt): Backup + Restore-Test, Dependabot, Trivy-Scan, Docker-Autostart, Mac-Ruhezustand, Rollback-Test, Tests im Workflow, Betriebsanleitung im README.
+- Hinweis: Mac geht heute nach 1 Minute in den Ruhezustand und Docker Desktop startet nicht automatisch → Seite sonst offline.
