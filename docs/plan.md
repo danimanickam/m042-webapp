@@ -3,8 +3,9 @@
 ## Aktueller Stand
 - Phase 0 (Voraussetzungen) abgeschlossen: Docker 29.9 / Compose 5.7 (arm64), git, gh (eingeloggt) vorhanden.
 - Phase 1 (Gesamtplan) freigegeben am 25.11.2026.
-- Phase 2 umgesetzt und getestet: App + DB laufen lokal auf `http://localhost:8080`, Zähler überlebt Neustart und Neuerstellen, Fehleranzeige ohne DB funktioniert. Wartet auf Danis Prüfung.
-- Nächster Schritt: Phase 3 – GitHub-Repository.
+- Phase 2 umgesetzt und getestet: App + DB laufen lokal auf `http://localhost:8080`, Zähler überlebt Neustart und Neuerstellen, Fehleranzeige ohne DB funktioniert. Von Dani geprüft (Neustart-Test 15 → 16).
+- Phase 3 umgesetzt: öffentliches Repo https://github.com/danimanickam/m042-webapp (Branch `main`), `.env` nicht enthalten. Secret Scanning und Push Protection aktiv (GitHub-Standard).
+- Nächster Schritt: Phase 4 – Image mit GitHub Actions bauen.
 
 ## Architektur (4 Container, docker compose)
 | Container | Image | Aufgabe |
@@ -26,9 +27,9 @@ Ablauf: Push auf `main` → GitHub Actions (arm64-Runner) baut Image mit Commit-
 - App lokal nur auf `127.0.0.1:8080`, DB ohne offenen Port.
 - Ohne DB: Seite zeigt «DB: FEHLER – nicht erreichbar», `/health` meldet Fehler (HTTP 503).
 - `.env` enthält nur `POSTGRES_PASSWORD` (zufällig); DB-Benutzer und DB-Name `app` sind nicht geheim.
+- Commits als «Dani» mit anonymer GitHub-noreply-Adresse (nur in diesem Repo gesetzt).
 - Datenvolume `m042-webapp_pgdata` (Postgres 18: Mount auf `/var/lib/postgresql`).
 
 ## Offene Fragen / Punkte für später
-- Phase 3: git-Name und E-Mail setzen (anonyme GitHub-noreply-Adresse vorgeschlagen).
 - Phase 4: `gh` braucht Recht `workflow` (Dani bestätigt im Browser); Paket auf öffentlich stellen.
 - Für Checkliste: updater hat Zugriff auf `docker.sock`; Tunnel-URL ändert bei Neustart; Docker Desktop muss nach Mac-Neustart laufen.
