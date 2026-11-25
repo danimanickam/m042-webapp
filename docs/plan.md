@@ -7,7 +7,8 @@
 - Phase 3 umgesetzt: öffentliches Repo https://github.com/danimanickam/m042-webapp (Branch `main`), `.env` nicht enthalten. Secret Scanning und Push Protection aktiv (GitHub-Standard).
 - Phase 4 umgesetzt: Workflow `.github/workflows/build.yml` baut bei jedem Push auf `main` (arm64-Runner, ca. 30 s) und pusht `ghcr.io/danimanickam/m042-webapp:latest` + `:sha-<hash>`. Erster Lauf grün; Image ist linux/arm64, enthält `APP_VERSION=2d69ea2`, anonym abrufbar (öffentlich).
 - Phase 5 umgesetzt: `app` nutzt `ghcr.io/danimanickam/m042-webapp:latest`, `updater` (Watchtower-Fork) prüft alle 60 s nur die App. Gemessen: Push → live in ca. 50 s (Build ~30 s + bis zu 60 s Wartezeit des Updaters). DB lief dabei ohne Unterbruch, Zähler blieb erhalten.
-- Nächster Schritt: Phase 6 – Cloudflare Quick Tunnel.
+- Phase 6 umgesetzt: Container `tunnel` (`cloudflare/cloudflared:2026.11.2`, Quick Tunnel auf `http://app:3000`). Öffentlich über HTTPS erreichbar, Zertifikat gültig, http → https-Weiterleitung. Aktuelle Adresse: `docker compose logs tunnel | grep trycloudflare`.
+- Nächster Schritt: Phase 7 – Push auf main geht ohne Handarbeit live.
 
 ## Architektur (4 Container, docker compose)
 | Container | Image | Aufgabe |
@@ -31,6 +32,7 @@ Ablauf: Push auf `main` → GitHub Actions (arm64-Runner) baut Image mit Commit-
 - `.env` enthält nur `POSTGRES_PASSWORD` (zufällig); DB-Benutzer und DB-Name `app` sind nicht geheim.
 - Commits als «Dani» mit anonymer GitHub-noreply-Adresse (nur in diesem Repo gesetzt).
 - Updater-Einstellungen: `WATCHTOWER_LABEL_ENABLE=true`, `POLL_INTERVAL=60`, `CLEANUP=true`, `REMOVE_VOLUMES=false`; App hat Label `com.centurylinklabs.watchtower.enable=true`. Lokales Bauen aus compose.yaml entfernt (nur noch Image aus CI).
+- Tunnel ohne Updater-Label: App-Updates ändern die öffentliche Adresse nicht. Adresse ändert nur bei Neustart des Tunnel-Containers.
 - Datenvolume `m042-webapp_pgdata` (Postgres 18: Mount auf `/var/lib/postgresql`).
 
 ## Offene Fragen / Punkte für später

@@ -47,6 +47,17 @@ services:
       retries: 3
       start_period: 10s
 
+  tunnel:
+    # Cloudflare Quick Tunnel: public https://<random>.trycloudflare.com URL, no account/token.
+    # The URL changes whenever this container restarts. Find it: docker compose logs tunnel
+    # No watchtower label on purpose, so app updates never change the public URL.
+    image: cloudflare/cloudflared:2026.11.2
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "--url", "http://app:3000"]
+    depends_on:
+      app:
+        condition: service_healthy
+
   updater:
     # Maintained fork of Watchtower (containrrr/watchtower is archived).
     image: nickfedor/watchtower:1.24.2
